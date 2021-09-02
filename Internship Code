@@ -1,0 +1,187 @@
+//for further reference all comments starting with a capitol letter are the functions of the code below it, while the ones starting with a lowercase take about the segment of code above them in more detail
+
+//Motivator
+
+let foodTypeResponse = [
+    'Cake',
+    'Bread',
+    'Drink',
+    'Breakfast'
+];
+
+let recipeProvider = context(() => {
+    follow(foodTypeResponse, p => {
+        let foodType = foodTypeResponse
+        p.play(foodType)
+        p.play('What food group would you like the recipe to be in?');
+
+    });
+});
+//wip
+
+let recipeYesNo = context(() => {
+    follow('Yes', p => {
+        p.play('Alright then, good luck on making it!');
+    });
+    
+    follow('No', p => {
+        p.play('Unfortunately this part of the script hasn\' been integrated yet. In the meantime you can search up many recipes through Google.')
+        //p.play('Don\'t worry I can provide one for you.');
+        //p.play("What kind of food would you like?")
+        //p.then(recipeProvider)
+    });
+});
+
+//the context allows the code to change it's response based on the answer for the making food motivator
+
+const needMotivation = [
+    'Hey Alan, I need some motivation',
+    'I need some motivation',
+    'Hey Alan, give me motivation',
+    'Motivate me'
+];
+
+//used a variable to have multiple phrases activate the motivator
+
+let Motivator = context(() => {
+    follow('(I\'m having issues with) sleep', p => {
+        p.play('Technology may be the issue. Try to stop using devices an hour before bed.', 
+              'I\'ve heard that listening to music, speedcasts, or putting relaxing sounds such as white noise or rain in the background can help.');
+        p.play('If you continue to have probelms you may want to ask other people if they have any other ideas or consult a doctor to check if anythings wrong.'
+        );
+    });
+    
+    follow('(I\'m having issues with) homework', p => {
+        p.play('Well it\'s better to get it done now instead of later, especially if you have other homework due soon.',
+            'If you have trouble focusing you can listen to music, turn off devices, or work with someone at the same time.'
+        );
+    });
+    
+    follow('(I\'m having issues with) (creating|drawing|painting) art', p => {
+        p.play('If you don\'t have ideas for what to draw or paint then perhaps you can search some up or when you do have ideas write them down in on a piece of paper or digital document for when you do have time to do it.'
+        );
+        p.play('(You can also draw things from your surroundings, people you care about, or things from media you enjoy such as characters from a tv show|You could also do certain challenges like using a random color palette, drawing things from memory, or painting with coffee or tea. If you\'d like more options then you can ask for a random art challenge).'
+        );
+        p.play('If not having ideas is the issue then maybe think about why you did art in the first place. It is supposed to be something that people enjoy, and not with other things like pleasing others or proving that you can do it.'
+        );
+        p.play('If you think your art isn\'t good enough or isn\'t meeting your standards then that\'s ok, sometimes we just have our off days and we will continue to improve as time goes on. I mean just look at some of your art from a year ago, it\'s possible to see improvement already.'        
+        );
+    });
+    
+    follow('(I\'m having issues with) (getting|making|baking|cooking) food ready', p => {
+        p.play('Food is important for your survival and it\'s good that you show concern for it. Think about what makes you want to bake or cook food in the first place or how much people close to you rely on it and enjoy it.'
+        );
+        p.play('Perhaps a recipe can help. Would you like to recieve one or do you already have an idea of what to make?'
+        );
+        p.then(recipeYesNo)
+    });
+    
+//have response to when they do have a recipe and if they don't use an api with categories and food warnings (ex:peanuts) to filter it out based on the person's preferences or allergies (for allergies perhaps something among the lines of "do you or any you know have any food related allergies, if so which ones?")
+
+    follow('(I\'m having issues with) (remembering to) (contact|text|call) (friends|family members|loved ones).', p => {
+        p.play('Hmmm it’s important to maintain relationships between those you care about, especially since they can make you feel better and improve your quality of life.')
+        p.play('(Perhaps you can leave some sticky notes with reminders around your living area or set up an alarm for when you have free time|Think about how much joy they give you, I mean you can contact them right now no need to leave it till later).')
+    });
+    
+    
+    follow('(I\'m having issues with) (gardening|watering plants).', p => {
+        p.play('Your plants are something that for the most part depend on you to provide them with the supplies they need to survive such as water, the right amount of sunlight, and a specific soil to grow in.')
+        p.play('Even missing just one of these could greatly affect their quality of life and caring for them even provides us with more oxygen to breathe.')
+        p.play('If your plants still aren\'t looking so good and you can\'t figure out why, there leaves can provide clues.')
+        p.play('Leaves can start yellowing, turn darker, and many other things based on certain deficiencies so I recommend searching up a plant defiency chart if you\'re curious.')
+    });
+});
+
+intent(needMotivation, p => {
+    p.play('What is the issue?',
+           'I am here to help! Tell me your struggles, usually teenagers like you need motivation in doing homework or sleeping early. Which is it?');
+    p.then(Motivator);
+});
+
+//the needMotivation variable makes it so any of the phrases put into the variable can activate it
+//p.play part is Alan's response to the person needing information and the p.then brings in the Motivator tree of responses
+
+
+//Art Challenge Generator
+
+const wantChallenge = [
+    'Hey, Alan give me an (art|drawing|painting) challenge',
+    'Give me an (art|drawing|painting) challenge',
+    'I want an (art|drawing|painting) challenge'
+];
+//this variable like the needMotivation one holds the multiple phrases that activate the art challenge generator
+
+const artChallenge = [
+    "a Random Color Pallete challenge, perhaps by using a website to generate one",
+    "a Monthly or Weekly Drawing Challenge such as Smaugust or Mermay",
+    "Redrawing a another piece of art that you did several years or even months before",
+    "a Random prompt generator to get ideas for what to draw",
+    "With your eyes closed select three random markers or color pencils to color with",
+    "to Draw with your non dominant hand challenge"
+];
+//the artChallenge variable holds several art challenges found online to be used in the generator
+
+intent(wantChallenge, p => {
+    function generateRandomNumber(max) {
+        return Math.floor(Math.random() * max) + 1;
+    }
+
+    let placement = generateRandomNumber(5);
+    //the function generateRandomNumber as it name suggests generates a random number from 0 to 5, including 5 since there are 6 art challenges 
+    //the let placement puts the number generated into a variable so that it can be used to call on one of the strings from the artChallenge variable
+    p.play('You can try ' + (artChallenge[placement]) + ".")
+    //the artChallenege[placement] makes it play a random one from the artChallenge variable using the random number generated
+    
+});
+
+
+//Fun Facts
+intent('What Fun Facts can you give me?', p => {
+    p.play('I can give you fun facts related to sleep, games, school, water, and food.')
+});
+//this intent lets people ask thet kind of fun facts that the code can provide
+
+intent('(What are some|Give me some) fun facts about sleep?', p => {
+    p.play('Fun fact about sleep: (Two thirds of cats life is spent asleep|Humans spend one third of their life asleep|Sleeping on your front can help with digestion|Within 5 minutes of waking up, 50% of your dream is forgotten|Sleep experts have discovered a direct link between people’s favourite sleeping positions and their personalities).');
+});
+
+intent('(What are some|Give me some) fun facts about games?', p => {
+    p.play('Fun fact about games: (Games are great for language gains|As of 2020, there are more gamers than ever|Video games have become a major spectator sport|The Atari ET video game is widely regarded as the worst video game ever created, and years after it was created, copies were found buried in the New Mexico desert|The average age of a gamer is 34).');
+});
+intent('(What are some|Give me some) fun facts about school?', p => {
+    p.play('Fun fact about school: (A school in the Philippines is made entirely of recycled pop bottles|The largest school in the world in terms of number of students is the City Montessori School in Lucknow, India|In most countries, public school isnt free.|Today, it might seem odd to give a teacher an apple, but in the 19th century, it was common practice|It tradition to give teachers apples as it was a belief that the apple was from the "Tree of knowledge" in the bible).');
+});
+
+intent('(What are some|Give me some) fun facts about water?', p => {
+    p.play('Fun fact about water: (There is the same amount of water on Earth as there was when the Earth was formed|Nearly 97% of the worlds water is salty or otherwise undrinkable|Less than 1% of the water supply on earth can be used as drinking water|About 6,800 gallons, or 25,700 liters, of water is required to grow a days food for a family of four|Our bodies are mostly water).');
+});
+intent('(What are some|Give me some) fun facts about food?', p => {
+    p.play('Fun fact about food: (McDonalds fries were cooked in beef fat until 1990|Hawaiian pizza did not come from Hawaii|Spam is a mashup of the words "spice" and "ham"|Most wasabi is just horseradish thats dyed green|A single spaghetti noodle is called a spaghetto).');
+});
+//the intents above let people ask for a fun fact about various topics and recieve a random one from the list in return
+
+
+//Question
+question(
+    'What does this (app|script|project) do',
+    'What is this (app|script|project|)',
+    'Why do I need this',
+    reply('This is a Motivator project. Its main purpose is to get you motivated in common situations! It can also give you fun facts on several topics.'),
+);
+
+question(
+    'How does this work',
+    'How to use this',
+    'What can I do here',
+    'What (should I|can I|to) say',
+    'What commands are available',
+    reply('Just say: (I need motivation|Remind me to action at time|What Fun Facts can you give me|Give me an art challenge).'),
+);
+
+question(
+    'What types of motivators can you give me',
+    'What can you motivate me on',
+    reply('There are many motivators here, as of now all of them are: sleep, homework, making food, art, and talking to friends')    
+);
+
+//responses to questions users might have when first using the application
